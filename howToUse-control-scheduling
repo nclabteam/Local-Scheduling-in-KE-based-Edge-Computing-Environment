@@ -1,0 +1,16 @@
+- To control the distribution of pods, edit file main.go in line 137:
+
+Change the following based on your intended distribution:
+
+podsDis["1node1"] = 7 
+podsDis["2node2"] = 1
+podsDis["3node3"] = 1
+
+- build:
+
+go build .
+
+- Delete all application pods cluster.
+- Execute newly created file.
+- Create new pods with yaml file.
+
