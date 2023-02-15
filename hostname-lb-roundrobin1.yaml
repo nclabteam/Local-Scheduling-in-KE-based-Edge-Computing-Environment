@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hostname-lb-edge1
+  labels:
+    app: hostname-lb-edge1
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: hostname-lb-edge1
+  template:
+    metadata:
+      labels:
+        app: hostname-lb-edge1
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: node-role.kubernetes.io/edge
+                  operator: Exists
+                - key: node-role.kubernetes.io/agent
+                  operator: Exists
+      nodeName: edge1
+      containers:
+        - name: hostname
+          image: crome98/simplewebapp:20210629
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "32Mi"
+            limits:
+              cpu: "50m"
+              memory: "100Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hostname-lb-svc1
+spec:
+  selector:
+    app: hostname-lb-edge1
+  ports:
+    - name: http-0
+      port: 12345
+      protocol: TCP
+      targetPort: 8080
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: hostname-lb-svc1
+spec:
+  host: hostname-lb-svc1
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
