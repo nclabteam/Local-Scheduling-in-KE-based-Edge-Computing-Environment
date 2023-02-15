@@ -1,0 +1,8 @@
+#hpa configurations
+application:
+  name: "app-example1"
+  namespace: "default"
+  defaultPods: 3
+k8sconfigpath:
+  path: "/home/kmaster/.kube/config"
+
